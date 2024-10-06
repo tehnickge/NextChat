@@ -1,5 +1,9 @@
+/* eslint-disable */
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import prisma from "../utils/prisma";
+import bcrypt from "bcryptjs";
+import IUser from "../models/IUser";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,18 +17,53 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         username: { label: "Username", type: "text", placeholder: "jsmith" },
         password: { label: "Password", type: "password" },
+        email: {
+          label: "Email",
+          type: "email",
+          placeholder: "ex@ex.any",
+        },
       },
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      //eslin
       async authorize(credentials, req) {
-        const user = { id: "1", name: "J Smith", email: "jsmith@example.com" };
+        const uName = credentials?.username;
+        const uEmail = credentials?.email;
+        const uPas = credentials?.password;
 
+        const user = await prisma.user.findUnique({
+          where: {
+            username: uName,
+            email: uEmail,
+          },
+        });
         if (user) {
-          return user;
-        } else {
-          return null;
+          return {
+            id: user.id.toString(),
+            name: user.username,
+            email: user.email,
+            password: user.password,
+          };
         }
+        return null;
       },
     }),
   ],
-  callbacks: {}
+  session: {
+    strategy: "jwt",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === "development",
+  callbacks: {
+    async signIn({ user, account, profile, email, credentials }) {
+      return true;
+    },
+    async redirect({ url, baseUrl }) {
+      return baseUrl;
+    },
+    async session({ session, user, token }) {
+      return session;
+    },
+    async jwt({ token, user, account, profile, isNewUser }) {
+      return token;
+    },
+  },
 };
