@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE `Chat` ADD COLUMN `photo` LONGBLOB NULL;
+
+-- AlterTable
+ALTER TABLE `User` ADD COLUMN `photo` LONGBLOB NULL;
