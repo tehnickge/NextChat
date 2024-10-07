@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { NextResponse } from "next/server";
 import { IChat } from "../../../../../../models/IChat";
 import prisma from "../../../../../../utils/prisma";
@@ -9,7 +10,10 @@ import {
 import { handleValidationError } from "../../../../../../utils/handleValidationError";
 import { checkUserExistById } from "../../../../../../utils/cheackUserExist";
 import IUserCompact from "../../../../../../models/IUserCompact";
-/* eslint-disable */
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../../../../../lib/authOptions";
+import { NextApiRequest, NextApiResponse } from "next";
+import { error } from "console";
 
 interface PropsChatWithUser {
   chatData: IChat;
@@ -47,31 +51,34 @@ const chatSchema: Yup.Schema<IChat> = Yup.object().shape({
   createdAt: Yup.date().optional(),
 });
 
-export const createChat = async (req: Request) => {
+export const createChat = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    const { userData, chatData }: PropsChatWithUser = await req.json();
+    const session = await getServerSession(req, res, authOptions);
+    if (!session) {
+      return res
+        .status(HTTP_STATUS.UNAUTHORIZED)
+        .json({ error: ERROR_MESSAGES.BAD_AUTHORIZED });
+    }
+
+    const { userData, chatData }: PropsChatWithUser = await req.body;
 
     const chat: IChat = await chatSchema.validate(chatData);
 
     if (!(await checkUserExistById(userData))) {
-      return NextResponse.json(
-        {
-          ERROR_MESSAGES: ERROR_MESSAGES.BAD_ARGUMENTS + ` id:${userData.id}`,
-        },
-        { status: HTTP_STATUS.BAD_REQUEST }
-      );
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        ERROR_MESSAGES: ERROR_MESSAGES.BAD_ARGUMENTS + ` id:${userData.id}`,
+      });
     }
 
     const newChat = await makeChat(chat, userData);
-    return NextResponse.json({ newChat });
+    return res.status(HTTP_STATUS.OK).json({ newChat });
   } catch (error) {
     if (error instanceof Yup.ValidationError) {
       return handleValidationError(error);
     }
     console.error("Ошибка при создании пользователя:", await error);
-    return NextResponse.json(
-      { error: ERROR_MESSAGES.UNEXPECTED_ERROR },
-      { status: HTTP_STATUS.SERVER_ERROR }
-    );
+    return res
+      .status(HTTP_STATUS.SERVER_ERROR)
+      .json({ error: ERROR_MESSAGES.UNEXPECTED_ERROR });
   }
 };
