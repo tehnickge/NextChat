@@ -12,7 +12,6 @@ import { checkUserExistById } from "../../../../../../utils/cheackUserExist";
 import IUserCompact from "../../../../../../models/IUserCompact";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../../lib/authOptions";
-import { NextApiRequest, NextApiResponse } from "next";
 
 interface PropsChatWithUser {
   chatData: IChat;
@@ -53,10 +52,11 @@ const chatSchema: Yup.Schema<IChat> = Yup.object().shape({
   createdAt: Yup.date().optional(),
 });
 
-export const createChat = async (req: NextRequest) => {
+export const createChat = async (req: NextRequest, res: NextResponse) => {
   try {
     const { userData, chatData }: PropsChatWithUser = await req.json();
-
+    const session = await getServerSession(authOptions);
+    console.log(session);
     const chat: IChat = await chatSchema.validate(chatData, {
       abortEarly: false,
     });
