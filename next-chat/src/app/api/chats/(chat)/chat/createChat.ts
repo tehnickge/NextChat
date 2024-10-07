@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { IChat } from "../../../../../../models/IChat";
 import prisma from "../../../../../../utils/prisma";
 import * as Yup from "yup";
@@ -13,7 +13,6 @@ import IUserCompact from "../../../../../../models/IUserCompact";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../../lib/authOptions";
 import { NextApiRequest, NextApiResponse } from "next";
-import { error } from "console";
 
 interface PropsChatWithUser {
   chatData: IChat;
@@ -46,39 +45,41 @@ const bufferSchema = Yup.mixed().test(
 const chatSchema: Yup.Schema<IChat> = Yup.object().shape({
   id: Yup.number().optional(),
   isGroup: Yup.boolean().required("isGroup required"),
-  name: Yup.string().min(3, "min len 3").max(15, "max len 15").optional(),
+  name: Yup.string()
+    .min(3, "name min len 3")
+    .max(15, "name max len 15")
+    .optional(),
   photo: Yup.mixed(bufferSchema),
   createdAt: Yup.date().optional(),
 });
 
-export const createChat = async (req: NextApiRequest, res: NextApiResponse) => {
+export const createChat = async (req: NextRequest) => {
   try {
-    const session = await getServerSession(req, res, authOptions);
-    if (!session) {
-      return res
-        .status(HTTP_STATUS.UNAUTHORIZED)
-        .json({ error: ERROR_MESSAGES.BAD_AUTHORIZED });
-    }
+    const { userData, chatData }: PropsChatWithUser = await req.json();
 
-    const { userData, chatData }: PropsChatWithUser = await req.body;
-
-    const chat: IChat = await chatSchema.validate(chatData);
+    const chat: IChat = await chatSchema.validate(chatData, {
+      abortEarly: false,
+    });
 
     if (!(await checkUserExistById(userData))) {
-      return res.status(HTTP_STATUS.BAD_REQUEST).json({
-        ERROR_MESSAGES: ERROR_MESSAGES.BAD_ARGUMENTS + ` id:${userData.id}`,
-      });
+      return NextResponse.json(
+        {
+          ERROR_MESSAGES: ERROR_MESSAGES.BAD_ARGUMENTS + ` id:${userData.id}`,
+        },
+        { status: HTTP_STATUS.BAD_REQUEST }
+      );
     }
 
     const newChat = await makeChat(chat, userData);
-    return res.status(HTTP_STATUS.OK).json({ newChat });
+    return NextResponse.json({ newChat }, { status: HTTP_STATUS.OK });
   } catch (error) {
     if (error instanceof Yup.ValidationError) {
       return handleValidationError(error);
     }
     console.error("Ошибка при создании пользователя:", await error);
-    return res
-      .status(HTTP_STATUS.SERVER_ERROR)
-      .json({ error: ERROR_MESSAGES.UNEXPECTED_ERROR });
+    return NextResponse.json(
+      { error: ERROR_MESSAGES.UNEXPECTED_ERROR },
+      { status: HTTP_STATUS.SERVER_ERROR }
+    );
   }
 };

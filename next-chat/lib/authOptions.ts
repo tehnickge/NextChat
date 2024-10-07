@@ -2,8 +2,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "../utils/prisma";
-import bcrypt from "bcryptjs";
-import IUser from "../models/IUser";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -59,11 +57,25 @@ export const authOptions: NextAuthOptions = {
     async redirect({ url, baseUrl }) {
       return baseUrl;
     },
-    async session({ session, user, token }) {
-      return session;
-    },
-    async jwt({ token, user, account, profile, isNewUser }) {
+    async jwt({ token, user }) {
+      // Добавляем информацию о пользователе в JWT
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+      }
       return token;
+    },
+    async session({ session, token }) {
+      // Добавляем данные из токена в сессию
+      if (token) {
+        session.user = {
+          id: token.id as string,
+          name: token.name,
+          email: token.email,
+        };
+      }
+      return session;
     },
   },
 };
