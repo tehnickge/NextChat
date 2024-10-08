@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import "./globals.scss";
 
 // import { ServerStyleSheet } from "styled-components";
@@ -17,11 +18,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <title>{metadata.title?.toString()}</title>
-      </head>
-      <body>{children}</body>
-    </html>
+    <AppRouterCacheProvider>
+      <html lang="en">
+        <head>
+          <title>{metadata.title?.toString()}</title>
+        </head>
+        <body>{children}</body>
+      </html>
+    </AppRouterCacheProvider>
   );
 }
