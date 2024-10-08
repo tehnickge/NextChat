@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.scss";
-import SessionWrapper from "../../containers/SessionWrapper/SessionWrapper";
+
 // import { ServerStyleSheet } from "styled-components";
 // import GlobalStyle from "../../styles/globalStyles";
 // import { ThemeProvider } from "styled-components";
@@ -17,13 +17,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SessionWrapper>
-      <html lang="en">
-        <head>
-          <title>{metadata.title?.toString()}</title>
-        </head>
-        <body>{children}</body>
-      </html>
-    </SessionWrapper>
+    <html lang="en">
+      <head>
+        <title>{metadata.title?.toString()}</title>
+      </head>
+      <body>{children}</body>
+    </html>
   );
 }

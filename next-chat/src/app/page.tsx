@@ -1,5 +1,5 @@
 "use client";
-import { useSession } from "next-auth/react";
+
 import styled, { ThemeProvider } from "styled-components";
 import theme from "../../styles/theme";
 import GlobalStyle from "../../styles/globalStyles";
@@ -7,9 +7,7 @@ import Dashboard from "../../components/dashboard/dasboard/Dashboard";
 import Link from "next/link";
 
 export default function Home() {
-  const session = useSession();
-  console.log(session.status);
-  console.log(session);
+
 
   return (
     <ThemeProvider theme={theme}>
