@@ -2,7 +2,6 @@
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 import IUser from "../../../../../models/IUser";
-import * as Yup from "yup";
 import prisma from "../../../../../utils/prisma";
 import {
   ERROR_MESSAGES,
@@ -17,22 +16,22 @@ const validUser = async (user: IUser): Promise<boolean> => {
     },
   });
   if (chekcuser) {
-   return await bcrypt.compare(user.password, chekcuser?.password) && user.name === chekcuser.username;
+    return (
+      (await bcrypt.compare(user.password, chekcuser?.password)) &&
+      user.name === chekcuser.username
+    );
   }
   return false;
 };
 
-const userSchema: Yup.Schema<IUser> = Yup.object().shape({
-  name: Yup.string()
-    .required("Name is required")
-    .min(4, "Name must be at least 4 characters")
-    .max(15, "Name must be less than 16 characters"),
-  email: Yup.string().required("Email is required").email("Invalid email"),
-  password: Yup.string()
-    .required("Password is required")
-    .min(4, "Password must be at least 4 characters")
-    .max(15, "Password must be less than 16 characters"),
-});
+const getUser = async (user: IUser) => {
+  const curUser = await prisma.user.findUnique({
+    where: {
+      username: user.name,
+    },
+  });
+  return curUser;
+};
 
 const login = async (req: NextRequest, res: NextResponse) => {
   try {
@@ -44,10 +43,11 @@ const login = async (req: NextRequest, res: NextResponse) => {
         { status: HTTP_STATUS.BAD_REQUEST }
       );
     }
-
+    const curUser = await getUser(userData);
+    if (!curUser) { return NextResponse.json({error: ERROR_MESSAGES.UNEXPECTED_ERROR})}
     const userJWT = {
-      username: userData.name,
-      id: userData.id,
+      username: curUser.username,
+      id: curUser.id,
     };
 
     const token = jwt.sign(userJWT, process.env.NEXT_PUBLIC_JWT_SECRET || "", {
@@ -59,11 +59,20 @@ const login = async (req: NextRequest, res: NextResponse) => {
       { status: HTTP_STATUS.OK }
     );
 
-    response.cookies.set("jwt_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-    });
+    response.cookies
+      .set("jwt_token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+      })
+      .set("userId", userJWT.id?.toString() || "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+      }).set("userName", userJWT.username, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/"});
 
     return response;
   } catch (error) {

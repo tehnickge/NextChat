@@ -3,26 +3,17 @@
 import styled, { ThemeProvider } from "styled-components";
 import theme from "../../styles/theme";
 import GlobalStyle from "../../styles/globalStyles";
-import Dashboard from "../../components/dashboard/dasboard/Dashboard";
-import Link from "next/link";
+import { Grid2 } from "@mui/material";
 
 export default function Home() {
-
-
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <Main>
-        <Dashboard></Dashboard>
-        <ul>
-          <li>
-            {" "}
-            <Link href="/register"> register</Link>
-          </li>
-          <li>
-            <Link href="/login"> login</Link>
-          </li>
-        </ul>
+        <Grid2 container spacing={2}>
+          <Grid2 size={4}></Grid2>
+          <Grid2 size={8}>aboba</Grid2>
+        </Grid2>
       </Main>
     </ThemeProvider>
   );
@@ -31,9 +22,6 @@ export default function Home() {
 const Main = styled.div`
   margin: 0;
   padding: 0;
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  flex-direction: row;
+  width: 100vw;
+  height: 100vh;
 `;
