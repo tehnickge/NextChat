@@ -11,7 +11,6 @@ import { handleValidationError } from "../../../../../../utils/handleValidationE
 import { checkUserExistById } from "../../../../../../utils/cheackUserExist";
 import IUserCompact from "../../../../../../models/IUserCompact";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../../../../../lib/authOptions";
 
 interface PropsChatWithUser {
   chatData: IChat;
@@ -52,11 +51,9 @@ const chatSchema: Yup.Schema<IChat> = Yup.object().shape({
   createdAt: Yup.date().optional(),
 });
 
-export const createChat = async (req: NextRequest, res: NextResponse) => {
+export const createChat = async (req: NextRequest) => {
   try {
     const { userData, chatData }: PropsChatWithUser = await req.json();
-    const session = await getServerSession(authOptions);
-    console.log(session);
     const chat: IChat = await chatSchema.validate(chatData, {
       abortEarly: false,
     });
@@ -76,7 +73,7 @@ export const createChat = async (req: NextRequest, res: NextResponse) => {
     if (error instanceof Yup.ValidationError) {
       return handleValidationError(error);
     }
-    console.error("Ошибка при создании пользователя:", await error);
+    console.error("Ошибка при создании чата:", await error);
     return NextResponse.json(
       { error: ERROR_MESSAGES.UNEXPECTED_ERROR },
       { status: HTTP_STATUS.SERVER_ERROR }
