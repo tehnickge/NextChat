@@ -38,9 +38,8 @@ const getChatsByIdOrName = async (username: string, userId?: number) => {
 };
 
 export const getAllchatOfUser = async (req: NextRequest) => {
+  
   try {
-    const { searchParams } = await req.nextUrl;
-
     const token =
       req.cookies.get("jwt_token")?.value ||
       req.headers.get("Authorization")?.split(" ")[1];
@@ -57,20 +56,8 @@ export const getAllchatOfUser = async (req: NextRequest) => {
     // отладочная информация !!!!!!!!!!!!!!!!!!!
     console.log("token", id, username);
 
-    const paramsId = searchParams.get("id");
-    const ParamsName = searchParams.get("username");
+    const chats = await getChatsByIdOrName(username || "", id);
 
-    if (
-      !id ||
-      id !== Number(paramsId) ||
-      !username ||
-      username !== ParamsName
-    ) {
-      return NextResponse.json({ error: ERROR_MESSAGES.BAD_ARGUMENTS });
-    }
-
-    const chats = await getChatsByIdOrName(ParamsName || "", id);
-
-    return NextResponse.json({ data: chats });
+    return NextResponse.json(chats);
   } catch (error) {}
 };
