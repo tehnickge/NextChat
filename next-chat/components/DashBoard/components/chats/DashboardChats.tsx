@@ -46,6 +46,8 @@ const StyledListItem = styled(ListItem)`
   }
 `;
 const StyledTextContainer = styled(ListItemText)`
+  max-height: 100px;
+  overflow: hidden;
   padding: 0;
   margin: 0;
   span {

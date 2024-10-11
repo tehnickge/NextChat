@@ -1,44 +1,74 @@
-import { CircularProgress, List, Typography } from "@mui/material";
+import {
+  Alert,
+  CircularProgress,
+  List,
+  modalClasses,
+  Typography,
+} from "@mui/material";
 import styled from "styled-components";
 import DashboardChats from "./components/chats/DashboardChats";
-import { useEffect, useState } from "react";
-import { IChat } from "../../models/IChat";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
-import { chatSlice } from "../../store/reducers/ChatsSlice";
-import { fetchChats } from "../../store/reducers/ActionCreators";
+import { chatAPI } from "../../services/ChatSirvice";
+import MenuBar from "./components/meneBar/MenuBar";
+import CreateChatDialog from "./components/createChatDialog/createChatDialog";
+
 
 const DashBoard = () => {
-  const { chats, isLoading, error } = useAppSelector(
-    (state) => state.chatsReducer
-  );
-  const { setChats } = chatSlice.actions;
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    dispatch(fetchChats())
-  }, []);
+  const {
+    data: chats,
+    error,
+    isLoading,
+  } = chatAPI.useFetchAllChatsOfUserQuery(null, {
+    pollingInterval: 5000,
+  });
+
   return (
-    <StyledList>
-      {error.length > 1 && <Typography>{error}</Typography>}
-      {isLoading && <CircularProgress color="secondary" />}
-      {chats &&
-        chats.map((chat) => (
-          <DashboardChats key={chat.id} chat={chat}></DashboardChats>
-        ))}
-    </StyledList>
+    <Container>
+      <StyledList>
+        {error && <Typography>ошибка</Typography>}
+        {isLoading && <CircularProgress color="secondary" />}
+        {chats &&
+          chats.map((chat) => (
+            <DashboardChats key={chat.id} chat={chat}></DashboardChats>
+          ))}
+        {chats && chats?.length < 1 && (
+          <StyledAlert severity="info">созданйте вош первый чат</StyledAlert>
+        )}
+      </StyledList>
+      <MenuBarStyled />
+      <CreateChatDialog />
+    </Container>
   );
 };
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Занимает всю высоту окна */
+`;
 
 const StyledList = styled(List)`
   padding: 0;
   margin: 0;
-  height: 100vh;
+  flex: 1; /* Занимает оставшееся пространство */
   background-color: ${({ theme }) => theme.colors.backgroundDatk};
   * {
     transition: 0.4s;
     background-color: ${({ theme }) => theme.colors.backgroundDatk};
   }
   overflow-y: auto;
+`;
+
+const StyledAlert = styled(Alert)`
+  display: flex;
+  justify-content: center; /* Центрирует содержимое */
+  margin-right: 100px;
+`;
+
+const MenuBarStyled = styled(MenuBar)`
+  height: 60px;
 `;
 
 export default DashBoard;
