@@ -10,12 +10,9 @@ import {
 import { handleValidationError } from "../../../../../../utils/handleValidationError";
 import { checkUserExistById } from "../../../../../../utils/cheackUserExist";
 import IUserCompact from "../../../../../../models/IUserCompact";
-import { getServerSession } from "next-auth";
+import jwt from "jsonwebtoken";
+import { IUserJWT } from "../../../../../../models/IUserJWT";
 
-interface PropsChatWithUser {
-  chatData: IChat;
-  userData: IUserCompact;
-}
 const makeChat = async (chat: IChat, user: IUserCompact) => {
   const newChat = await prisma.chat.create({
     data: {
@@ -53,21 +50,32 @@ const chatSchema: Yup.Schema<IChat> = Yup.object().shape({
 
 export const createChat = async (req: NextRequest) => {
   try {
-    const { userData, chatData }: PropsChatWithUser = await req.json();
+    const chatData: IChat = await req.json();
     const chat: IChat = await chatSchema.validate(chatData, {
       abortEarly: false,
     });
+    const token =
+      req.cookies.get("jwt_token")?.value ||
+      req.headers.get("Authorization")?.split(" ")[1];
+    if (!token) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+    const { id: userID, username: userName } = jwt.verify(
+      token,
+      process.env.NEXT_PUBLIC_JWT_SECRET || ""
+    ) as IUserJWT;
 
-    if (!(await checkUserExistById(userData))) {
+    if (!(await checkUserExistById({ id: userID }))) {
       return NextResponse.json(
         {
-          ERROR_MESSAGES: ERROR_MESSAGES.BAD_ARGUMENTS + ` id:${userData.id}`,
+          error: ERROR_MESSAGES.BAD_ARGUMENTS + ` id:${userID}`,
         },
         { status: HTTP_STATUS.BAD_REQUEST }
       );
     }
 
-    const newChat = await makeChat(chat, userData);
+    const newChat = await makeChat(chat, { id: userID });
+
     return NextResponse.json({ newChat }, { status: HTTP_STATUS.OK });
   } catch (error) {
     if (error instanceof Yup.ValidationError) {

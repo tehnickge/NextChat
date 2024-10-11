@@ -12,13 +12,14 @@ import jwt from "jsonwebtoken";
 const validUser = async (user: IUser): Promise<boolean> => {
   const chekcuser = await prisma.user.findUnique({
     where: {
-      username: user.name,
+      username: user.username,
     },
   });
+
   if (chekcuser) {
     return (
       (await bcrypt.compare(user.password, chekcuser?.password)) &&
-      user.name === chekcuser.username
+      user.username === chekcuser.username
     );
   }
   return false;
@@ -27,7 +28,7 @@ const validUser = async (user: IUser): Promise<boolean> => {
 const getUser = async (user: IUser) => {
   const curUser = await prisma.user.findUnique({
     where: {
-      username: user.name,
+      username: user.username,
     },
   });
   return curUser;
@@ -43,8 +44,12 @@ const login = async (req: NextRequest, res: NextResponse) => {
         { status: HTTP_STATUS.BAD_REQUEST }
       );
     }
+
     const curUser = await getUser(userData);
-    if (!curUser) { return NextResponse.json({error: ERROR_MESSAGES.UNEXPECTED_ERROR})}
+
+    if (!curUser) {
+      return NextResponse.json({ error: ERROR_MESSAGES.UNEXPECTED_ERROR });
+    }
     const userJWT = {
       username: curUser.username,
       id: curUser.id,
@@ -59,20 +64,11 @@ const login = async (req: NextRequest, res: NextResponse) => {
       { status: HTTP_STATUS.OK }
     );
 
-    response.cookies
-      .set("jwt_token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-      })
-      .set("userId", userJWT.id?.toString() || "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-      }).set("userName", userJWT.username, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/"});
+    response.cookies.set("jwt_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    });
 
     return response;
   } catch (error) {

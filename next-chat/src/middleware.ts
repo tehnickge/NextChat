@@ -39,5 +39,5 @@ export async function middleware(req: NextRequest) {
 
 // Указываем, какие маршруты должны использовать эту middleware
 export const config = {
-  matcher: ["/api/chats/:path*", "/chats/:path*"],
+  matcher: ["/api/chats/:path*", "/chats/:path*", "/user/:path*"],
 }; // Пример защищённого маршрута

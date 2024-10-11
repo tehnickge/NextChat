@@ -1,7 +1,10 @@
+/* eslint-disable */
+import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 import IUser from "../../../../models/IUser";
 import prisma from "../../../../utils/prisma";
 import { ERROR_MESSAGES, HTTP_STATUS } from "../../../../models/httpConstants";
+import { IUserJWT } from "../../../../models/IUserJWT";
 
 const getChatsByIdOrName = async (username: string, userId?: number) => {
   if (!userId && !username) {
@@ -36,24 +39,24 @@ const getChatsByIdOrName = async (username: string, userId?: number) => {
 
 export const getAllchatOfUser = async (req: NextRequest) => {
   try {
-    const { searchParams } = await req.nextUrl;
+    const token =
+      req.cookies.get("jwt_token")?.value ||
+      req.headers.get("Authorization")?.split(" ")[1];
 
-    const id = searchParams.get("id");
-    const name = searchParams.get("username");
-    const cookieUserId = Number(await req.cookies.get("userId")?.value);
-    const cookieUsername = await req.cookies.get("userName")?.value;
-
-    if (
-      !cookieUserId ||
-      cookieUserId !== Number(id) ||
-      !cookieUsername ||
-      cookieUsername !== name
-    ) {
-      return NextResponse.json({ error: ERROR_MESSAGES.BAD_ARGUMENTS });
+    if (!token) {
+      return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    const chats = await getChatsByIdOrName(name || "", Number(id));
+    const { id, username } = jwt.verify(
+      token,
+      process.env.NEXT_PUBLIC_JWT_SECRET || ""
+    ) as IUserJWT;
 
-    return NextResponse.json({ data: chats });
+    // отладочная информация !!!!!!!!!!!!!!!!!!!
+    console.log("token", id, username);
+
+    const chats = await getChatsByIdOrName(username || "", id);
+
+    return NextResponse.json(chats);
   } catch (error) {}
 };
