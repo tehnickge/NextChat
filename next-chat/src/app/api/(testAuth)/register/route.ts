@@ -12,7 +12,7 @@ import { handleValidationError } from "../../../../../utils/handleValidationErro
 
 // Схема валидации пользователя
 const userSchema: Yup.Schema<IUser> = Yup.object().shape({
-  name: Yup.string()
+  username: Yup.string()
     .required("Name is required")
     .min(4, "Name must be at least 4 characters")
     .max(15, "Name must be less than 16 characters"),
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 
     // Проверка существования имени пользователя и почты
     if (
-      await checkUsernameAndEmailExists(validatedUser.name, validatedUser.email)
+      await checkUsernameAndEmailExists(validatedUser.username, validatedUser.email)
     ) {
       return NextResponse.json(
         {
@@ -65,12 +65,13 @@ export async function POST(req: Request) {
     // Создание нового пользователя
     const createdUser = await prisma.user.create({
       data: {
-        username: validatedUser.name,
+        username: validatedUser.username,
         password: hashedPassword,
         email: validatedUser.email,
       },
     });
     return NextResponse.json(createdUser, { status: HTTP_STATUS.OK });
+    
   } catch (error) {
     if (error instanceof Yup.ValidationError) {
       return handleValidationError(error);

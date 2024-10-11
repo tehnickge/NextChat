@@ -12,13 +12,14 @@ import jwt from "jsonwebtoken";
 const validUser = async (user: IUser): Promise<boolean> => {
   const chekcuser = await prisma.user.findUnique({
     where: {
-      username: user.name,
+      username: user.username,
     },
   });
+
   if (chekcuser) {
     return (
       (await bcrypt.compare(user.password, chekcuser?.password)) &&
-      user.name === chekcuser.username
+      user.username === chekcuser.username
     );
   }
   return false;
@@ -27,7 +28,7 @@ const validUser = async (user: IUser): Promise<boolean> => {
 const getUser = async (user: IUser) => {
   const curUser = await prisma.user.findUnique({
     where: {
-      username: user.name,
+      username: user.username,
     },
   });
   return curUser;
@@ -43,7 +44,9 @@ const login = async (req: NextRequest, res: NextResponse) => {
         { status: HTTP_STATUS.BAD_REQUEST }
       );
     }
+
     const curUser = await getUser(userData);
+
     if (!curUser) {
       return NextResponse.json({ error: ERROR_MESSAGES.UNEXPECTED_ERROR });
     }

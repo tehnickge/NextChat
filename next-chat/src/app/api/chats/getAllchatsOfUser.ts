@@ -38,7 +38,6 @@ const getChatsByIdOrName = async (username: string, userId?: number) => {
 };
 
 export const getAllchatOfUser = async (req: NextRequest) => {
-  
   try {
     const token =
       req.cookies.get("jwt_token")?.value ||

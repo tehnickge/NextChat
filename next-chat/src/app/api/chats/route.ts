@@ -1,4 +1,3 @@
 import { getAllchatOfUser } from "./getAllchatsOfUser";
 
-
-export {getAllchatOfUser as GET}
+export { getAllchatOfUser as GET };
