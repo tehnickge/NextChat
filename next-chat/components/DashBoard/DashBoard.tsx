@@ -15,7 +15,6 @@ import React from "react";
 import ContainerWithChats from "./components/ContainerWithChats/ContainerWithChats";
 
 const DashBoard = () => {
-  const dispatch = useAppDispatch();
 
   return (
     <Container>

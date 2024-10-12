@@ -1,8 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { IChat } from "../models/IChat";
 import IUser from "../models/IUser";
-import { ChatWithUser } from "../models/chatWithUser";
 import { AddUserToChatProps } from "@/app/api/chats/(chat)/chat/adduser/addUserToChat";
+import { ChatsWithLastMessage } from "../models/ChatsWithLastMessage";
+import { MessageWithSender } from "../models/MessegaWithUserSender";
+import { usersInChat } from "@/app/api/chats/(chat)/chat/getUsersInChat/route";
+import { IMessage } from "../models/IMessage";
 
 export const chatAPI = createApi({
   reducerPath: "chatsAPI",
@@ -51,6 +54,40 @@ export const chatAPI = createApi({
         url: "/chats/chat/adduser",
         method: "PUT",
         body: data,
+      }),
+    }),
+    getChatsWithLastMessage: build.query<ChatsWithLastMessage[], null>({
+      query: () => ({
+        url: "/chats/chat/getAllChatsWithLastMessage",
+        method: "GET",
+      }),
+    }),
+    getAllUsersInChat: build.query<usersInChat[], number>({
+      query: (id: number) => ({
+        url: "/chats/chat/getUsersInChat",
+        params: {
+          _id: id,
+        },
+      }),
+    }),
+    getChat: build.query<MessageWithSender[], number>({
+      query: (id: number) => ({
+        url: "/chats/chat",
+        params: {
+          _id: id,
+        },
+      }),
+    }),
+    getYourId: build.query<number, null>({
+      query: () => ({
+        url: "/getYourId",
+      }),
+    }),
+    sendMessage: build.mutation<IMessage, IMessage>({
+      query: (mes: IMessage) => ({
+        url: "/chats/chat/messages",
+        method: "POST",
+        body: mes,
       }),
     }),
   }),

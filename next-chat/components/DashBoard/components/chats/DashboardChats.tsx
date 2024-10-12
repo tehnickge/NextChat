@@ -8,16 +8,18 @@ import {
 } from "@mui/material";
 import styled from "styled-components";
 import { IChat } from "../../../../models/IChat";
+import { ChatsWithLastMessage } from "../../../../models/ChatsWithLastMessage";
 
 interface DashboardChatsProps {
-  chat?: IChat;
+  chat?: ChatsWithLastMessage;
   children?: React.ReactNode;
+  onClick?(): void;
 }
 
-const DashboardChats = ({ chat, children }: DashboardChatsProps) => {
+const DashboardChats = ({ chat, children, onClick }: DashboardChatsProps) => {
   return (
     <StyledListItem alignItems="flex-start">
-      <ListItemButton disableRipple>
+      <ListItemButton disableRipple onClick={onClick}>
         <ListItemAvatar>
           <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
         </ListItemAvatar>
@@ -25,8 +27,8 @@ const DashboardChats = ({ chat, children }: DashboardChatsProps) => {
           primary={chat && chat.name}
           secondary={
             <Typography component="span" variant="body2">
-              <h4>Ali Connors</h4>
-              <h5> — I'll be in your neighborhood doing errands this…</h5>
+              <h4>{chat?.users[0].username}</h4>
+              <h5> {(chat?.messages[0] && chat?.messages[0].content) || ""}</h5>
             </Typography>
           }
         />

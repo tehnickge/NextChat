@@ -34,24 +34,16 @@ export default function CreateChatDialog() {
   }) => {
     try {
       const { data: newChat } = await createChat(chat);
-      console.log("newChat", await newChat);
       if (!newChat) {
         return "error";
       }
 
       for (const id of users) {
-        console.log(
-          await (newChat && newChat.id),
-          "tesvaliddata",
-          await newChat,
-          await newChat.id
-        );
         if (newChat && newChat.id) {
           const userAdded = await addUser({
             user: { id: id },
             chat: { id: newChat.id, isGroup: newChat.isGroup },
           });
-          console.log("userADD", userAdded.error);
         }
       }
       dispatch(setIsComplite(true));

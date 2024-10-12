@@ -2,15 +2,38 @@ import styled from "styled-components";
 import { chatAPI } from "../../../../services/ChatSirvice";
 import { Alert, CircularProgress, List, Typography } from "@mui/material";
 import DashboardChats from "../chats/DashboardChats";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
+import { chatSlice } from "../../../../store/reducers/ChatsSlice";
+import { ChatsWithLastMessage } from "../../../../models/ChatsWithLastMessage";
 
 const ContainerWithChats = () => {
   const {
     data: chats,
     error,
     isLoading,
-  } = chatAPI.useFetchAllChatsOfUserQuery(null, {
-    pollingInterval: 10000,
+  } = chatAPI.useGetChatsWithLastMessageQuery(null, {
+    pollingInterval: 2000,
   });
+
+  const dispatch = useAppDispatch();
+  const { selectedChat, userWhoSandLasMessage, lastMessegeInchat } =
+    useAppSelector((state) => state.chatsReducer);
+
+  const { setLastMessegeSet, setSelectedChat, setUserWhoSandLasMessage } =
+    chatSlice.actions;
+
+  const hendlerChatSelect = (chat: ChatsWithLastMessage) => {
+    dispatch(setSelectedChat(chat.id));
+    if (chat.messages.length > 0 && chat.messages[0].sender) {
+      dispatch(setLastMessegeSet(chat.messages[0].content || "1"));
+      dispatch(
+        setUserWhoSandLasMessage(chat.messages[0].sender.username || "1")
+      );
+    } else {
+      dispatch(setLastMessegeSet(""));
+      dispatch(setUserWhoSandLasMessage(""));
+    }
+  };
 
   return (
     <StyledList>
@@ -18,7 +41,13 @@ const ContainerWithChats = () => {
       {isLoading && <CircularProgress color="secondary" />}
       {chats &&
         chats.map((chat) => (
-          <DashboardChats key={chat.id} chat={chat}></DashboardChats>
+          <DashboardChats
+            key={chat.id}
+            chat={chat}
+            onClick={() => {
+              hendlerChatSelect(chat);
+            }}
+          ></DashboardChats>
         ))}
       {chats && chats?.length < 1 && (
         <StyledAlert severity="info">созданйте ваш первый чат</StyledAlert>

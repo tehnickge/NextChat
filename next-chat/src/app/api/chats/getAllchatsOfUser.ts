@@ -58,5 +58,7 @@ export const getAllchatOfUser = async (req: NextRequest) => {
     const chats = await getChatsByIdOrName(username || "", id);
 
     return NextResponse.json(chats);
-  } catch (error) {}
+  } catch (error) {
+    return NextResponse.json(error, { status: HTTP_STATUS.SERVER_ERROR });
+  }
 };
