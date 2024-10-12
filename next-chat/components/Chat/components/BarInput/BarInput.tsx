@@ -1,17 +1,56 @@
-import { IconButton, TextField } from "@mui/material";
+import { Alert, IconButton, TextField } from "@mui/material";
 import styled from "styled-components";
 import SendIcon from "@mui/icons-material/Send";
+import { chatAPI } from "../../../../services/ChatSirvice";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
+import { chatSlice } from "../../../../store/reducers/ChatsSlice";
+import { ChangeEvent } from "react";
+import { IMessage } from "../../../../models/IMessage";
 
 const BarInput = () => {
+  const sendMessege = async (chatId: number, messageContent: string) => {
+    try {
+      const message: IMessage = {
+        chatId: chatId,
+        content: messageContent,
+        image: null,
+      };
+      const res = await newMsg(message);
+      return res.data;
+    } catch (e) {
+      return e;
+    }
+  };
+
+  const [newMsg, { error, isLoading, isSuccess }] =
+    chatAPI.useSendMessageMutation();
+
+  const { setMessage } = chatSlice.actions;
+  const { selectedChat, messege } = useAppSelector(
+    (state) => state.chatsReducer
+  );
+
+  const dispatch = useAppDispatch();
+
+  const handlerSendMessage = () => {
+    if (selectedChat && messege) {
+      sendMessege(selectedChat, messege);
+    }
+    dispatch(setMessage(""));
+  };
+
   return (
     <Container>
+      {error && <Alert severity="error">{}</Alert>}
       <StyledTextField
         id="filled-search"
-        label="Search field"
+        label="Enter message"
         type="search"
         variant="filled"
+        value={messege}
+        onChange={(e) => dispatch(setMessage(e.target.value))}
       />
-      <StyledIconButton disableRipple>
+      <StyledIconButton disableRipple onClick={handlerSendMessage}>
         <SendIcon />
       </StyledIconButton>
     </Container>
@@ -31,22 +70,22 @@ const StyledTextField = styled(TextField)`
   margin-right: 10px; /* Отступ между TextField и кнопкой */
   & .MuiOutlinedInput-root {
     & fieldset {
-      border-color: #ff00cc; /* Цвет рамки */
+      border-color: #ffffff; /* Цвет рамки */
     }
     &:hover fieldset {
-      border-color: #00ccff; /* Цвет рамки при наведении */
+      border-color: #ffffff; /* Цвет рамки при наведении */
     }
     &.Mui-focused fieldset {
-      border-color: #ff00cc; /* Цвет рамки при фокусе */
+      border-color: #ffffff; /* Цвет рамки при фокусе */
     }
   }
 
   & .MuiInputLabel-root {
-    color: #ff00cc; /* Цвет label */
+    color: #ffffff; /* Цвет label */
   }
 
   & .MuiInputLabel-root.Mui-focused {
-    color: #ff00cc; /* Цвет label при фокусе */
+    color: #ffffff; /* Цвет label при фокусе */
   }
 `;
 
@@ -55,13 +94,13 @@ const StyledIconButton = styled(IconButton)`
   align-items: center;
   align-items: center;
   padding: 0px 20px;
-  background-color: #ff00cc; /* Цвет кнопки */
+  background-color: #4c00ff; /* Цвет кнопки */
   color: white; /* Цвет иконки */
   &:hover {
-    background-color: #e600b3; /* Цвет при наведении */
+    background-color: #1100ff; /* Цвет при наведении */
   }
   * {
-    background-color: #ff00cc;
+    background-color: #4400ff;
   }
 `;
 

@@ -2,40 +2,41 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
-import { IUserJWT } from "../../../../../../models/IUserJWT";
-import prisma from "../../../../../../utils/prisma";
+import { IUserJWT } from "../../../../../../../models/IUserJWT";
+import { checkUserExistInChat } from "../../../../../../../utils/checkUserExistInChat";
 import {
   ERROR_MESSAGES,
   HTTP_STATUS,
-} from "../../../../../../models/httpConstants";
-import { checkUserExistInChat } from "../../../../../../utils/checkUserExistInChat";
-import { MessageWithSender } from "../../../../../../models/MessegaWithUserSender";
+} from "../../../../../../../models/httpConstants";
+import prisma from "../../../../../../../utils/prisma";
 
-const getMessagesByChatId = async (chatId: number) => {
+export interface usersInChat {
+  id: number;
+  photo: Buffer<ArrayBufferLike> | null;
+  username: string;
+}
+
+const getAllusersInChat = async (chatId: number) => {
   if (!chatId) {
     return [];
   }
 
-  const messages : MessageWithSender[] = await prisma.message.findMany({
-    where: {
-      chatId: chatId, // Фильтруем сообщения по ID чата
-    },
+  const chatWithUsers = await prisma.chat.findUnique({
+    where: { id: chatId },
     include: {
-      sender: {
+      users: {
         select: {
           id: true,
           username: true,
           photo: true,
-          // Здесь можно исключить password и email
         },
       },
     },
-    orderBy: {
-      createdAt: "asc", // Сортируем сообщения по дате (по возрастанию)
-    },
   });
-
-  return messages;
+  if (chatWithUsers) {
+    return chatWithUsers.users as usersInChat[];
+  }
+  return [];
 };
 export const getChat = async (req: NextRequest) => {
   try {
@@ -64,9 +65,11 @@ export const getChat = async (req: NextRequest) => {
       });
     }
 
-    const chat = await getMessagesByChatId(idChat);
+    const chat = await getAllusersInChat(idChat);
     return NextResponse.json(chat, { status: HTTP_STATUS.OK });
   } catch (error) {
     return NextResponse.json(error, { status: HTTP_STATUS.SERVER_ERROR });
   }
 };
+
+export {};

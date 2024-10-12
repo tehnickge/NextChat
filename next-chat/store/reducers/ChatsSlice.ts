@@ -1,23 +1,34 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IChat } from "../../models/IChat";
 
 interface ChatState {
-  isLoading: boolean;
-  error: string;
-  selectedChat?: number;
+  selectedChat: number | null;
+  lastMessegeInchat: string | null;
+  userWhoSandLasMessage: string | null;
+  messege: string | null;
 }
 
 const initalState: ChatState = {
-  isLoading: false,
-  error: "",
+  selectedChat: null,
+  lastMessegeInchat: null,
+  userWhoSandLasMessage: null,
+  messege: null,
 };
 
 export const chatSlice = createSlice({
   name: "chats",
   initialState: initalState,
   reducers: {
-    Select: (state, action: PayloadAction<number>) => {
+    setSelectedChat: (state, action: PayloadAction<number>) => {
       state.selectedChat = action.payload;
+    },
+    setLastMessegeSet: (state, action: PayloadAction<string>) => {
+      state.lastMessegeInchat = action.payload;
+    },
+    setUserWhoSandLasMessage: (state, action: PayloadAction<string>) => {
+      state.userWhoSandLasMessage = action.payload;
+    },
+    setMessage: (state, action: PayloadAction<string>) => {
+      state.messege = action.payload;
     },
   },
 });
