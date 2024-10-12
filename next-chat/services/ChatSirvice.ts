@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { IChat } from "../models/IChat";
 import IUser from "../models/IUser";
+import { ChatWithUser } from "../models/chatWithUser";
+import { AddUserToChatProps } from "@/app/api/chats/(chat)/chat/adduser/addUserToChat";
 
 export const chatAPI = createApi({
   reducerPath: "chatsAPI",
@@ -39,11 +41,17 @@ export const chatAPI = createApi({
     }),
     createNewChat: build.mutation<IChat, IChat>({
       query: (chat: IChat) => ({
-        url: "/chats",
+        url: "/chats/chat",
         method: "POST",
         body: chat,
       }),
     }),
-    // addUserToChat: build.mutation()
+    addUserToChat: build.mutation<IChat, AddUserToChatProps>({
+      query: (data: AddUserToChatProps) => ({
+        url: "/chats/chat/adduser",
+        method: "PUT",
+        body: data,
+      }),
+    }),
   }),
 });

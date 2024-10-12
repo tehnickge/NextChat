@@ -1,6 +1,5 @@
-export default interface IUserCompact  {
-    id: number;
-    name?: string;
-    email?: string;
-
+export default interface IUserCompact {
+  id: number;
+  username?: string;
+  email?: string;
 }

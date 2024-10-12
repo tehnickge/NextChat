@@ -37,7 +37,7 @@ const getUser = async (user: IUser) => {
 const login = async (req: NextRequest, res: NextResponse) => {
   try {
     const userData: IUser = await req.json();
-
+    console.log(userData);
     if (!(await validUser(userData))) {
       return NextResponse.json(
         { error: ERROR_MESSAGES.BAD_ARGUMENTS },
@@ -80,3 +80,15 @@ const login = async (req: NextRequest, res: NextResponse) => {
 };
 
 export { login as POST };
+function NextCors(
+  req: NextRequest,
+  res: NextResponse<unknown>,
+  arg2: {
+    // Укажите разрешённые домены
+    origin: string;
+    methods: string[];
+    optionsSuccessStatus: number;
+  }
+) {
+  throw new Error("Function not implemented.");
+}
