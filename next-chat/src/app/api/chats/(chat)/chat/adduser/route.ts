@@ -1,3 +1,3 @@
 import { addUserToChat } from "./addUserToChat";
 
-export { addUserToChat as POST };
+export { addUserToChat as PUT };

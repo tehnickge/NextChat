@@ -76,7 +76,7 @@ export const createChat = async (req: NextRequest) => {
 
     const newChat = await makeChat(chat, { id: userID });
 
-    return NextResponse.json({ newChat }, { status: HTTP_STATUS.OK });
+    return NextResponse.json(newChat, { status: HTTP_STATUS.OK });
   } catch (error) {
     if (error instanceof Yup.ValidationError) {
       return handleValidationError(error);
