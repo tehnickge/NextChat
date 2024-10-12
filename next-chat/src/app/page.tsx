@@ -4,6 +4,7 @@ import styled, { ThemeProvider } from "styled-components";
 import { Grid2 } from "@mui/material";
 import DashBoard from "../../components/DashBoard/DashBoard";
 import Chat from "../../components/Chat/Chat";
+import { useState } from "react";
 
 export default function Home() {
   return (
