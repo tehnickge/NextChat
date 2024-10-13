@@ -5,6 +5,7 @@ interface ChatState {
   lastMessegeInchat: string | null;
   userWhoSandLasMessage: string | null;
   messege: string | null;
+  image: Buffer<ArrayBufferLike> | null;
 }
 
 const initalState: ChatState = {
@@ -12,6 +13,7 @@ const initalState: ChatState = {
   lastMessegeInchat: null,
   userWhoSandLasMessage: null,
   messege: null,
+  image: null,
 };
 
 export const chatSlice = createSlice({
@@ -29,6 +31,9 @@ export const chatSlice = createSlice({
     },
     setMessage: (state, action: PayloadAction<string>) => {
       state.messege = action.payload;
+    },
+    setImage: (state, action: PayloadAction<Buffer<ArrayBufferLike>>) => {
+      state.image = action.payload;
     },
   },
 });

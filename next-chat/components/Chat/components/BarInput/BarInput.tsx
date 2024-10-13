@@ -50,6 +50,7 @@ const BarInput = () => {
         value={messege}
         onChange={(e) => dispatch(setMessage(e.target.value))}
       />
+      <input type="file"></input>
       <StyledIconButton disableRipple onClick={handlerSendMessage}>
         <SendIcon />
       </StyledIconButton>
