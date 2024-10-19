@@ -5,15 +5,28 @@ import DashboardChats from "../chats/DashboardChats";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import { chatSlice } from "../../../../store/reducers/ChatsSlice";
 import { ChatsWithLastMessage } from "../../../../models/ChatsWithLastMessage";
+import { useEffect } from "react";
+import { dashboardSlice } from "../../../../store/reducers/DashboardSlice";
 
-const ContainerWithChats = () => {
+import React from "react";
+import { Socket } from "socket.io-client";
+import { DefaultEventsMap } from "socket.io";
+
+interface ContainerWithCatsProps {
+  socket: Socket<DefaultEventsMap, DefaultEventsMap>;
+}
+
+const ContainerWithChats: React.FC<ContainerWithCatsProps> = ({ socket }) => {
   const {
     data: chats,
     error,
     isLoading,
-  } = chatAPI.useGetChatsWithLastMessageQuery(null, {
-    pollingInterval: 2000,
-  });
+    refetch,
+  } = chatAPI.useGetChatsWithLastMessageQuery(null);
+
+  useEffect(() => {
+    refetch();
+  }, [socket]);
 
   const dispatch = useAppDispatch();
   const { selectedChat, userWhoSandLasMessage, lastMessegeInchat } =

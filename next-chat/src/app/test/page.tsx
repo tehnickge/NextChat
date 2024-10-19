@@ -1,34 +1,31 @@
 "use client";
 import { io } from "socket.io-client";
-import { useEffect, useState, useRef } from "react";
+import { use, useEffect, useState } from "react";
 import ChatPage from "../../../components/test";
+import { chatAPI } from "../../../services/ChatSirvice";
+import { Box } from "@mui/material";
+import { IChat } from "../../../models/IChat";
 
 export default function Home() {
   const [showChat, setShowChat] = useState(false);
   const [userName, setUserName] = useState("");
   const [showSpinner, setShowSpinner] = useState(false);
   const [roomId, setroomId] = useState("");
+  const [chats, setChats] = useState();
+  const [msg, setMsg] = useState("");
 
-  // Используем useRef для хранения экземпляра socket, чтобы избежать его пересоздания
-  const socketRef = useRef<any>(null);
+  const { data } = chatAPI.useGetYourIdQuery(null);
 
-  useEffect(() => {
-    // Создаем новое соединение только при монтировании компонента
-    socketRef.current = io("http://89.179.242.42:3001");
-
-    // Отключаем сокет при размонтировании компонента
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
-    };
-  }, []); // Пустой массив зависимостей, чтобы useEffect выполнялся только один раз
+  var socket: any;
+  socket = io("http://89.179.242.42:3001");
 
   const handleJoin = () => {
     if (userName !== "" && roomId !== "") {
       console.log(userName, "userName", roomId, "roomId");
-      socketRef.current.emit("join_room", roomId);
+      socket.emit("join_room", roomId);
+      socket.emit("test", data);
       setShowSpinner(true);
+      // You can remove this setTimeout and add your own logic
       setTimeout(() => {
         setShowChat(true);
         setShowSpinner(false);
@@ -38,6 +35,18 @@ export default function Home() {
     }
   };
 
+  const handleSendMsg = () => {
+    socket.emit("send_msg_test", { message: msg, roomId: 40 });
+  };
+
+  useEffect(() => {
+    socket.on("yourchats", (userData: any) => {
+      setChats(userData);
+    });
+    socket.on("recive_msg_test", (data: any) => {
+      console.log(data);
+    });
+  }, [socket]);
   return (
     <div>
       <div style={{ display: showChat ? "none" : "" }}>
@@ -53,18 +62,27 @@ export default function Home() {
           onChange={(e) => setroomId(e.target.value)}
           disabled={showSpinner}
         />
-        <button onClick={handleJoin}>
+        <button onClick={() => handleJoin()}>
           {!showSpinner ? "Join" : <div></div>}
         </button>
       </div>
       <div>
-        {showChat && (
-          <ChatPage
-            socket={socketRef.current}
-            roomId={roomId}
-            username={userName}
-          />
-        )}
+        <ChatPage socket={socket} roomId={roomId} username={userName} />
+      </div>
+      <div>
+        <input
+          onChange={(e) => {
+            setMsg(e.target.value);
+          }}
+        />
+        <button onClick={handleSendMsg} />
+        <Box>
+          {chats &&
+            chats.chats &&
+            chats.chats.map((chat: IChat) => (
+              <div key={chat.id}>{chat.name}</div>
+            ))}
+        </Box>
       </div>
     </div>
   );

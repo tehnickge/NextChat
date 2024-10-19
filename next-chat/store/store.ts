@@ -2,10 +2,14 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import chatsReducer from "./reducers/ChatsSlice";
 import newChatModalReducer from "./reducers/ModalNewChatSlice";
 import { chatAPI } from "../services/ChatSirvice";
+import dashboardReducer from "./reducers/DashboardSlice";
+import currentChatReducer from "./reducers/CurrentChatSlice";
 
 const rootReducer = combineReducers({
   chatsReducer,
   newChatModalReducer,
+  dashboardReducer,
+  currentChatReducer,
   [chatAPI.reducerPath]: chatAPI.reducer,
 });
 

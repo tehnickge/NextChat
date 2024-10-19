@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import style from "./chat.module.css";
 
 interface IMsgDataTypes {
   roomId: String | number;
@@ -16,7 +17,7 @@ const ChatPage = ({ socket, username, roomId }: any) => {
     e.preventDefault();
     if (currentMsg !== "") {
       const msgData: IMsgDataTypes = {
-        roomId: roomId,
+        roomId,
         user: username,
         msg: currentMsg,
         time:
@@ -38,7 +39,7 @@ const ChatPage = ({ socket, username, roomId }: any) => {
   return (
     <div>
       <div>
-        <div style={{ marginBottom: "1rem" }}>
+        <div>
           <p>
             Name: <b>{username}</b> and Room Id: <b>{roomId}</b>
           </p>

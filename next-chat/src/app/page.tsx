@@ -4,17 +4,30 @@ import styled, { ThemeProvider } from "styled-components";
 import { Grid2 } from "@mui/material";
 import DashBoard from "../../components/DashBoard/DashBoard";
 import Chat from "../../components/Chat/Chat";
-import { useState } from "react";
+import { chatAPI } from "../../services/ChatSirvice";
+import socket from "../../utils/socket";
+import { useEffect } from "react";
 
 export default function Home() {
+  const { data } = chatAPI.useGetYourIdQuery(null);
+
+  useEffect(() => {
+    localStorage.debug = "*";
+    socket.on("connect", () => {
+      console.log("Connected to Socket.io server", socket.id);
+    });
+    if (data) {
+      socket.emit("join_your_chats", data);
+    }
+    }, [data]);
   return (
     <Main>
       <StyledGrid2 container>
         <StyledGrid2 size={3}>
-          <DashBoard></DashBoard>
+          <DashBoard socket={socket}></DashBoard>
         </StyledGrid2>
         <StyledGrid2 size={9}>
-          <Chat></Chat>
+          <Chat socket={socket}></Chat>
         </StyledGrid2>
       </StyledGrid2>
     </Main>
