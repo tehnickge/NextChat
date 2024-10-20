@@ -3,14 +3,29 @@ import styled from "styled-components";
 import BarInput from "./components/BarInput/BarInput";
 import Field from "./components/Field/Field";
 
-const Chat = () => {
+import { DefaultEventsMap } from "socket.io";
+import { Socket } from "socket.io-client";
+
+interface ChatProps {
+  socket: Socket<DefaultEventsMap, DefaultEventsMap>;
+}
+
+const Chat = ({ socket }: ChatProps) => {
+  // useEffect(() => {
+  //   socket.emit("get-chat", selectedChat);
+  // }, [socket]);
+
+  // useEffect(() => {
+  //   setMsgInChat(messagesData);
+  // }, [messagesData]);
+
   return (
     <StyledContainer>
       <StyledFieldContainer>
-        <Field></Field>
+        <Field socket={socket}></Field>
       </StyledFieldContainer>
       <StyledBarInputContainer>
-        <BarInput></BarInput>
+        <BarInput socket={socket}></BarInput>
       </StyledBarInputContainer>
     </StyledContainer>
   );

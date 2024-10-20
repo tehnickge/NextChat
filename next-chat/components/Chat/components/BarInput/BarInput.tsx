@@ -4,10 +4,15 @@ import SendIcon from "@mui/icons-material/Send";
 import { chatAPI } from "../../../../services/ChatSirvice";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import { chatSlice } from "../../../../store/reducers/ChatsSlice";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { IMessage } from "../../../../models/IMessage";
+import { Socket } from "socket.io-client";
+import { DefaultEventsMap } from "socket.io";
 
-const BarInput = () => {
+interface BarInputProps {
+  socket: Socket<DefaultEventsMap, DefaultEventsMap>;
+}
+const BarInput = ({ socket }: BarInputProps) => {
   const sendMessege = async (chatId: number, messageContent: string) => {
     try {
       const message: IMessage = {
@@ -16,6 +21,7 @@ const BarInput = () => {
         image: null,
       };
       const res = await newMsg(message);
+      socket.emit("send_message_chat", res.data);
       return res.data;
     } catch (e) {
       return e;
@@ -36,6 +42,7 @@ const BarInput = () => {
     if (selectedChat && messege) {
       sendMessege(selectedChat, messege);
     }
+
     dispatch(setMessage(""));
   };
 
@@ -47,9 +54,10 @@ const BarInput = () => {
         label="Enter message"
         type="search"
         variant="filled"
-        value={messege}
+        value={messege || ""}
         onChange={(e) => dispatch(setMessage(e.target.value))}
       />
+      <input type="file"></input>
       <StyledIconButton disableRipple onClick={handlerSendMessage}>
         <SendIcon />
       </StyledIconButton>

@@ -1,24 +1,21 @@
-import {
-  Alert,
-  CircularProgress,
-  List,
-  modalClasses,
-  Typography,
-} from "@mui/material";
+"use client";
 import styled from "styled-components";
-import DashboardChats from "./components/chats/DashboardChats";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux";
-import { chatAPI } from "../../services/ChatSirvice";
 import MenuBar from "./components/menuBar/MenuBar";
 import CreateChatDialog from "./components/createChatDialog/createChatDialog";
-import React from "react";
+import React, { useEffect } from "react";
 import ContainerWithChats from "./components/ContainerWithChats/ContainerWithChats";
+import { chatAPI } from "../../services/ChatSirvice";
+import { Socket } from "socket.io-client";
+import { DefaultEventsMap } from "socket.io";
 
-const DashBoard = () => {
+interface DashBoardPros {
+  socket: Socket<DefaultEventsMap, DefaultEventsMap>;
+}
 
+const DashBoard = ({ socket }: DashBoardPros) => {
   return (
     <Container>
-      <ContainerWithChats></ContainerWithChats>
+      <ContainerWithChats socket={socket}></ContainerWithChats>
       <MenuBarStyled />
       <CreateChatDialog />
     </Container>
