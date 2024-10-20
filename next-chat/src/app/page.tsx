@@ -61,6 +61,7 @@ const Main = styled.div`
 `;
 
 const DevData = styled.div`
+  background: linear-gradient(to right, #a54b0f7f, #69088661, #3314a536);
   text-align: center;
   width: 100%;
   z-index: 100;
