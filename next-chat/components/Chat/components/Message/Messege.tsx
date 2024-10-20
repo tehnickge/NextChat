@@ -47,6 +47,7 @@ const Message = ({
 };
 
 const MessageContainer = styled(Box)<{ isSender: boolean }>`
+  box-sizing: border-box;
   display: flex;
   align-items: flex-end;
   justify-content: ${(props) => (props.isSender ? "flex-end" : "flex-start")};
@@ -59,25 +60,50 @@ const AvatarContainer = styled(Box)`
 `;
 
 const MessageContent = styled(Box)<{ isSender: boolean }>`
-  background-color: ${(props) => (props.isSender ? "#dcf8c6" : "#ffffff")};
-  border-radius: 16px;
+position: relative;
   padding: 10px 15px;
   max-width: 60%;
-  position: relative;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  border-radius: 12px;
+  z-index: 1;
+  background-color: transparent; /* Основной фон для чётких рамок */
+  overflow: hidden; /* Чтобы псевдоэлемент не выходил за границы */
+
+  // Добавляем размытие градиента через псевдоэлемент
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    z-index: -1;
+    background: ${(props) =>
+      props.isSender
+        ? "linear-gradient(135deg, #b46c00, #860092)" // Градиент для отправителя
+        : "linear-gradient(135deg, #2abec9, #20148f)"}; // Градиент для получателя
+    filter: blur(15px); /* Размытие градиента */
+    border-radius: 20px; /* Более плавные края */
+  }
+
+  // Чёткие рамки
   border-top-${(props) => (props.isSender ? "right" : "left")}-radius: 0;
+  border: 2px solid transparent; /* Добавляем чёткую рамку */
+
 `;
 
 const Username = styled(Typography)`
   font-size: 0.85rem;
   font-weight: bold;
   margin-bottom: 5px;
-  color: #4a4a4a;
+  color: #c2c2c2;
 `;
 
 const MessageText = styled(Typography)`
+  overflow-wrap: break-word;
   font-size: 0.95rem;
-  color: #333;
+  color: #ffffff;
 `;
 
 const MessageTimestamp = styled(Typography)`

@@ -22,7 +22,18 @@ io.on("connection", async (socket) => {
   socket.on("send_message_chat", async (data) => {
     console.log("newMsg", data);
     console.log(socket.id);
-    socket.to(data.chatId).emit("receive_message", data);
+    const user = await prisma.user.findUnique({
+      where: {
+        id: data.senderId,
+      },
+      select: {
+        username: true, // Выбираем только поле username
+      },
+    });
+    data.sender = {};
+    data.sender.id = data.senderId;
+    data.sender.username = user.username;
+    io.in(data.chatId).emit("receive_message", data);
   });
 
   socket.on("sends-dashboard-chats", async (newChats) => {

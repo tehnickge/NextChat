@@ -25,7 +25,16 @@ const ContainerWithChats: React.FC<ContainerWithCatsProps> = ({ socket }) => {
   } = chatAPI.useGetChatsWithLastMessageQuery(null);
 
   useEffect(() => {
-    refetch();
+    const handleReceiveMessage = (data: any) => {
+      refetch();
+    };
+
+    socket.on("receive_message", handleReceiveMessage);
+
+    // Возвращаем функцию для удаления предыдущего слушателя при размонтировании компонента или перед новым вызовом
+    return () => {
+      socket.off("receive_message", handleReceiveMessage);
+    };
   }, [socket]);
 
   const dispatch = useAppDispatch();

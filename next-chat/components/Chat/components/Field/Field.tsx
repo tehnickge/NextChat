@@ -16,6 +16,7 @@ const Field = ({ socket }: FieldProps) => {
   const dispatch = useAppDispatch();
   const { selectedChat } = useAppSelector((state) => state.chatsReducer);
   const {
+    refetch,
     data: messagesData,
     error,
     isLoading,
@@ -30,10 +31,16 @@ const Field = ({ socket }: FieldProps) => {
   }, [messagesData]);
 
   useEffect(() => {
-    socket.on("receive_message", (data) => {
-      console.log(data);
+    const handleReceiveMessage = (data: any) => {
       dispatch(appendMessage(data));
-    });
+    };
+
+    socket.on("receive_message", handleReceiveMessage);
+
+    // Возвращаем функцию для удаления предыдущего слушателя при размонтировании компонента или перед новым вызовом
+    return () => {
+      socket.off("receive_message", handleReceiveMessage);
+    };
   }, [socket]);
 
   return (

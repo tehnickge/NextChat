@@ -22,7 +22,6 @@ const BarInput = ({ socket }: BarInputProps) => {
       };
       const res = await newMsg(message);
       socket.emit("send_message_chat", res.data);
-      console.log(socket);
       return res.data;
     } catch (e) {
       return e;
@@ -55,7 +54,7 @@ const BarInput = ({ socket }: BarInputProps) => {
         label="Enter message"
         type="search"
         variant="filled"
-        value={messege}
+        value={messege || ""}
         onChange={(e) => dispatch(setMessage(e.target.value))}
       />
       <input type="file"></input>

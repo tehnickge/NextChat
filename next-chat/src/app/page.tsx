@@ -6,22 +6,36 @@ import DashBoard from "../../components/DashBoard/DashBoard";
 import Chat from "../../components/Chat/Chat";
 import { chatAPI } from "../../services/ChatSirvice";
 import socket from "../../utils/socket";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [isConnect, setIsConnect] = useState<boolean>(false);
   const { data } = chatAPI.useGetYourIdQuery(null);
 
   useEffect(() => {
-    localStorage.debug = "*";
     socket.on("connect", () => {
-      console.log("Connected to Socket.io server", socket.id);
+      setIsConnect(true);
     });
+    socket.on("socket", () => {});
     if (data) {
       socket.emit("join_your_chats", data);
     }
-    }, [data]);
+    socket.on("disconnect", () => {
+      setIsConnect(false);
+    });
+
+    return () => {
+      socket.off("connect", () => {
+        console.log("disconnect");
+      });
+      socket.off("disconnect", () => {
+        console.log("disconnect");
+      });
+    };
+  }, [data]);
   return (
     <Main>
+      <DevData>data:{isConnect ? "connect" : "unconnect"}</DevData>
       <StyledGrid2 container>
         <StyledGrid2 size={3}>
           <DashBoard socket={socket}></DashBoard>
@@ -44,4 +58,20 @@ const Main = styled.div`
   padding: 0;
   width: 100vw;
   height: 100vh;
+`;
+
+const DevData = styled.div`
+  text-align: center;
+  width: 100%;
+  z-index: 100;
+  color: red;
+  position: absolute;
+  margin: 0 auto;
+  padding: 0;
+  display: block;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  justify-items: center;
 `;
