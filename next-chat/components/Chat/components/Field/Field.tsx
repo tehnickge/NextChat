@@ -41,7 +41,7 @@ const Field = ({ socket }: FieldProps) => {
     return () => {
       socket.off("receive_message", handleReceiveMessage);
     };
-  }, [socket]);
+  }, []);
 
   return (
     <Container>
