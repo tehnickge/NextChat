@@ -27,6 +27,7 @@
     "@types/socket.io-client": "^3.0.0",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
+    "browser-image-compression": "^2.0.2",
     "jose": "^5.9.3",
     "jsonwebtoken": "^9.0.2",
     "next": "14.2.14",

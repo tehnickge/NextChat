@@ -12,7 +12,7 @@ import prisma from "../../../../../../../utils/prisma";
 
 export interface usersInChat {
   id: number;
-  photo: Buffer<ArrayBufferLike> | null;
+  photo: Buffer<ArrayBufferLike> | null | string;
   username: string;
 }
 
@@ -65,11 +65,19 @@ export const getChat = async (req: NextRequest) => {
       });
     }
 
-    const chat = await getAllusersInChat(idChat);
-    return NextResponse.json(chat, { status: HTTP_STATUS.OK });
+    const usersInChat = await getAllusersInChat(idChat);
+
+    const convertedImageUsersInChat = usersInChat.map((user) => ({
+      ...user,
+      photo: user.photo ? user.photo.toString("base64") : null,
+    }));
+
+    return NextResponse.json(convertedImageUsersInChat, {
+      status: HTTP_STATUS.OK,
+    });
   } catch (error) {
     return NextResponse.json(error, { status: HTTP_STATUS.SERVER_ERROR });
   }
 };
 
-export {};
+export { getChat as GET };

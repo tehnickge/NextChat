@@ -45,6 +45,11 @@ const BarInput = ({ socket }: BarInputProps) => {
 
     dispatch(setMessage(""));
   };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handlerSendMessage();
+    }
+  };
 
   return (
     <Container>
@@ -56,6 +61,7 @@ const BarInput = ({ socket }: BarInputProps) => {
         variant="filled"
         value={messege || ""}
         onChange={(e) => dispatch(setMessage(e.target.value))}
+        onKeyDown={handleKeyDown}
       />
       <input type="file"></input>
       <StyledIconButton disableRipple onClick={handlerSendMessage}>
@@ -76,6 +82,7 @@ const Container = styled.div`
 const StyledTextField = styled(TextField)`
   flex-grow: 1; /* Растягиваем по ширине */
   margin-right: 10px; /* Отступ между TextField и кнопкой */
+
   & .MuiOutlinedInput-root {
     & fieldset {
       border-color: #ffffff; /* Цвет рамки */
@@ -93,7 +100,20 @@ const StyledTextField = styled(TextField)`
   }
 
   & .MuiInputLabel-root.Mui-focused {
-    color: #ffffff; /* Цвет label при фокусе */
+    color: rgba(53, 53, 53, 0); /* Цвет label при фокусе */
+  }
+
+  /* Стиль для текста ввода */
+  & .MuiInputBase-input {
+    color: #ffffff; /* Цвет текста */
+    font-size: 16px; /* Размер текста */
+    padding: 10px; /* Внутренние отступы */
+  }
+
+  /* Дополнительно: Placeholder (подсказка внутри поля) */
+  & .MuiInputBase-input::placeholder {
+    color: #cccccc; /* Цвет текста placeholder */
+    opacity: 1; /* Для некоторых браузеров, чтобы placeholder был видимым */
   }
 `;
 

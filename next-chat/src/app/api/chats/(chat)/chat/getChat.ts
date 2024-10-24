@@ -1,3 +1,4 @@
+import { usersInChat } from "@/app/api/chats/(chat)/chat/getUsersInChat/route";
 /* eslint-disable */
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
@@ -10,33 +11,35 @@ import {
 } from "../../../../../../models/httpConstants";
 import { checkUserExistInChat } from "../../../../../../utils/checkUserExistInChat";
 import { MessageWithSender } from "../../../../../../models/MessegaWithUserSender";
+import { ChatUser } from "../../../../../../store/reducers/CurrentChatSlice";
 
-const getMessagesByChatId = async (chatId: number) => {
+const getMessagesByChatId = async (chatId: number, take = 5, skip = 0) => {
   if (!chatId) {
     return [];
   }
 
-  const messages : MessageWithSender[] = await prisma.message.findMany({
+  const messages: MessageWithSender[] = await prisma.message.findMany({
     where: {
-      chatId: chatId, // Фильтруем сообщения по ID чата
+      chatId: chatId,
     },
     include: {
       sender: {
         select: {
           id: true,
           username: true,
-          photo: true,
-          // Здесь можно исключить password и email
         },
       },
     },
     orderBy: {
-      createdAt: "asc", // Сортируем сообщения по дате (по возрастанию)
+      createdAt: "desc",
     },
+    take, // Ограничение количества сообщений
+    skip, // Пропуск уже загруженных сообщений
   });
 
   return messages;
 };
+
 export const getChat = async (req: NextRequest) => {
   try {
     const token =
@@ -52,6 +55,8 @@ export const getChat = async (req: NextRequest) => {
 
     const { searchParams, pathname } = req.nextUrl;
     const idChat = Number(searchParams.get("_id"));
+    const take = Number(searchParams.get("_take"));
+    const skip = Number(searchParams.get("_skip"));
 
     if (
       !(await checkUserExistInChat(
@@ -64,8 +69,11 @@ export const getChat = async (req: NextRequest) => {
       });
     }
 
-    const chat = await getMessagesByChatId(idChat);
-    return NextResponse.json(chat, { status: HTTP_STATUS.OK });
+    const chat = (await getMessagesByChatId(idChat, take, skip)).reverse();
+
+    return NextResponse.json(chat, {
+      status: HTTP_STATUS.OK,
+    });
   } catch (error) {
     return NextResponse.json(error, { status: HTTP_STATUS.SERVER_ERROR });
   }

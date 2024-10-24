@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { chatAPI } from "../../../../services/ChatSirvice";
 import IUser from "../../../../models/IUser";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { useRouter } from "next/navigation";
 
 interface FormData {
   username: string;
@@ -13,6 +14,7 @@ interface FormData {
 }
 
 const RegisterForm: React.FC = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     username: "",
     email: "",
@@ -40,6 +42,10 @@ const RegisterForm: React.FC = () => {
       password: password,
     } as IUser);
   };
+
+  {
+    isSuccess && userData && router.push("/login");
+  }
 
   return (
     <StyldedBox

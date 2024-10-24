@@ -37,7 +37,6 @@ const getUser = async (user: IUser) => {
 const login = async (req: NextRequest, res: NextResponse) => {
   try {
     const userData: IUser = await req.json();
-    console.log(userData);
     if (!(await validUser(userData))) {
       return NextResponse.json(
         { error: ERROR_MESSAGES.BAD_ARGUMENTS },

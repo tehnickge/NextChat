@@ -10,7 +10,7 @@ export const GET = async (req: NextRequest) => {
 
     response.cookies.delete("jwt_token").delete("userId").delete("userName");
 
-    return response.json;
+    return await response;
   } catch (err) {
     return err;
   }

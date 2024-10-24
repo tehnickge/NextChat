@@ -70,11 +70,16 @@ export const chatAPI = createApi({
         },
       }),
     }),
-    getChat: build.query<MessageWithSender[], number>({
-      query: (id: number) => ({
+    getChat: build.query<
+      MessageWithSender[],
+      { id: number; take: number; skip: number }
+    >({
+      query: ({ id, take, skip }) => ({
         url: "/chats/chat",
         params: {
           _id: id,
+          _take: take,
+          _skip: skip,
         },
       }),
     }),

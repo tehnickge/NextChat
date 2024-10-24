@@ -1,9 +1,10 @@
 import { Avatar, Box, Typography } from "@mui/material";
 import { IMessage } from "../../../../models/IMessage";
 import styled from "styled-components";
+import Image from "next/image";
 
 interface MassegeProps {
-  avatarImage: Buffer<ArrayBufferLike> | null;
+  avatarImage: Buffer<ArrayBufferLike> | null | string;
   isSender: boolean;
   messege: string | null;
   timestamp: Date;
@@ -30,11 +31,18 @@ const Message = ({
           year: "numeric",
         })
       : "Неверная дата";
+
   return (
     <MessageContainer isSender={isSender}>
       {!isSender && avatarImage && (
         <AvatarContainer>
-          <Avatar alt={username} />
+          <Image
+            alt={username || ""}
+            src={`data:image/jpeg;base64,${avatarImage}`}
+            quality={1}
+            width={30}
+            height={30}
+          ></Image>
         </AvatarContainer>
       )}
       <MessageContent isSender={isSender}>
@@ -56,7 +64,11 @@ const MessageContainer = styled(Box)<{ isSender: boolean }>`
 `;
 
 const AvatarContainer = styled(Box)`
+  background-color: red;
   margin-right: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
 `;
 
 const MessageContent = styled(Box)<{ isSender: boolean }>`
