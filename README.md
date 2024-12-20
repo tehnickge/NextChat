@@ -11,6 +11,7 @@ NextChat — это современное веб-приложение для о
 - [Использование](#-использование)
 - [Тестирование](#-тестирование)
 - [Схема данных](#-схема-данных)
+- [Дорожная карта](#-дорожная-карта)
 
 ---
 
@@ -34,6 +35,7 @@ NextChat — это современное веб-приложение для о
 - **Next.js**
 - **Node.js**
 - **Express**
+- **ReduxToolkit**
 - **MySql** с использованием **Prisma ORM**
 - **Socket.IO** для обмена сообщениями в реальном времени
 - **Jest** для тестирования
@@ -105,44 +107,50 @@ NextChat — это современное веб-приложение для о
    ```bash
    npm test
    ```
-## 📂 Схема данных
+## 📂 Схема данных prisma
 1. Модель **<u>User</u>**
-   ```ts
+   ```prisma
    {
-     id        Int      @id @default(autoincrement())
-     username  String   @unique
-     email     String   @unique
+     id        Int     
+     username  String   
+     email     String   
      password  String
      messages  Message[] 
-     chats     Chat[]    @relation("UserChats") 
-     createdAt DateTime @default(now())
+     chats     Chat[]
+     createdAt DateTime 
      photo     Bytes?
    }
    ```
 
 
 2. Модель **<u>Chat</u>**
-   ```ts 
+   ```prisma 
    {
-     id          Int       @id @default(autoincrement())
-     isGroup     Boolean   @default(false) 
+     id          Int       
+     isGroup     Boolean    
      name        String?   
-     users       User[]    @relation("UserChats") 
+     users       User[]     
      messages    Message[] 
-     createdAt   DateTime  @default(now())
+     createdAt   DateTime  
      photo       Bytes?
    }
    ```
 3. Модель **<u>Message</u>**
-   ```ts 
+   ```prisma 
    {
-     id         Int       @id @default(autoincrement())
+     id         Int       
      content    String?   
      image      Bytes?    
-     sender     User      @relation(fields: [senderId], references: [id])
+     sender     User      
      senderId   Int
-     chat       Chat      @relation(fields: [chatId], references: [id])
+     chat       Chat      
      chatId     Int
-     createdAt  DateTime  @default(now())
+     createdAt  DateTime  
    }
    ```
+## 🗺️ Дорожная карта: 
+- [x] **Создание чат комнат**
+- [x]
+- [x]
+- [x]
+   
