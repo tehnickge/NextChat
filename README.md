@@ -94,9 +94,52 @@ NextChat — это современное веб-приложение для о
    npm run dev
    ```
 ## ⚙ Использование
-**---После запуска приложения вы можете---**:
+**осле запуска приложения вы можете**:
+---
+- Зарегистрировать нового пользователя.
+- Создавать новые чат-комнаты.
+- Присоединяться к существующим комнатам.
+- бмениваться сообщениями в реальном времени с другими пользователями.
+## 🧪 Тестирование
+**Для запуска тестов используйте команду**:
+   ```bash
+   npm test
+   ```
+## 📂 Схема данных
+1. модель <ul>User</ul>
+   '''ts
+   {
+     id        Int      @id @default(autoincrement())
+     username  String   @unique
+     email     String   @unique
+     password  String
+     messages  Message[] 
+     chats     Chat[]    @relation("UserChats") 
+     createdAt DateTime @default(now())
+     photo     Bytes?
+   }
+   '''
 
-Зарегистрировать нового пользователя.
-Создавать новые чат-комнаты.
-Присоединяться к существующим комнатам.
-Обмениваться сообщениями в реальном времени с другими пользователями.
+
+
+Chat {
+  id          Int       @id @default(autoincrement())
+  isGroup     Boolean   @default(false) 
+  name        String?   
+  users       User[]    @relation("UserChats") 
+  messages    Message[] 
+  createdAt   DateTime  @default(now())
+  photo       Bytes?
+}
+
+
+Message {
+  id         Int       @id @default(autoincrement())
+  content    String?   
+  image      Bytes?    
+  sender     User      @relation(fields: [senderId], references: [id])
+  senderId   Int
+  chat       Chat      @relation(fields: [chatId], references: [id])
+  chatId     Int
+  createdAt  DateTime  @default(now())
+}
