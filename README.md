@@ -106,8 +106,8 @@ NextChat — это современное веб-приложение для о
    npm test
    ```
 ## 📂 Схема данных
-1. модель <ul>User</ul>
-   '''ts
+1. Модель **<u>User</u>**
+   ```ts
    {
      id        Int      @id @default(autoincrement())
      username  String   @unique
@@ -118,28 +118,31 @@ NextChat — это современное веб-приложение для о
      createdAt DateTime @default(now())
      photo     Bytes?
    }
-   '''
+   ```
 
 
-
-Chat {
-  id          Int       @id @default(autoincrement())
-  isGroup     Boolean   @default(false) 
-  name        String?   
-  users       User[]    @relation("UserChats") 
-  messages    Message[] 
-  createdAt   DateTime  @default(now())
-  photo       Bytes?
-}
-
-
-Message {
-  id         Int       @id @default(autoincrement())
-  content    String?   
-  image      Bytes?    
-  sender     User      @relation(fields: [senderId], references: [id])
-  senderId   Int
-  chat       Chat      @relation(fields: [chatId], references: [id])
-  chatId     Int
-  createdAt  DateTime  @default(now())
-}
+2. Модель **<u>Chat</u>**
+   ```ts 
+   {
+     id          Int       @id @default(autoincrement())
+     isGroup     Boolean   @default(false) 
+     name        String?   
+     users       User[]    @relation("UserChats") 
+     messages    Message[] 
+     createdAt   DateTime  @default(now())
+     photo       Bytes?
+   }
+   ```
+3. Модель **<u>Message</u>**
+   ```ts 
+   {
+     id         Int       @id @default(autoincrement())
+     content    String?   
+     image      Bytes?    
+     sender     User      @relation(fields: [senderId], references: [id])
+     senderId   Int
+     chat       Chat      @relation(fields: [chatId], references: [id])
+     chatId     Int
+     createdAt  DateTime  @default(now())
+   }
+   ```
